@@ -1,0 +1,94 @@
+*{
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header .navbar{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    padding-top: 0px;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+}
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.social-icons{
+    position: static;
+    right: 50px;
+    bottom: 0%; 
+}
+
+ 
+.social-icons ul li{
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+}
+
+.social-icons ul li a{
+    display: block;
+    color: #fff;
+    text-align: center;
+    padding: 12px 17px;
+    font-size: 20px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.5s;
+}
+
+.social-icons ul li a:hover{
+    background: #c32865;
+    color: #fff;
+}
+
+.copy-right{
+    position: static;
+    left: 0 px;
+    bottom: 4%;   
+}
+
+.copy-right p{
+    color: #fff;
+}
+
+input{
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    color:  black;
+}
+input[type="text"] {
+    width: 600px;
+}
+input[type="email"]{
+    width: 600px;
+}
+
+input[type="submit"]{
+    background-color: dimgray;
+    color: black;
+}
+
+textarea {
+    margin: 20px 0 0 0;
+    padding: 5px;
+    border-width: 5px;
+    border-color: dimgray;
+    border-radius: 5px;
+    color: black;
+}
