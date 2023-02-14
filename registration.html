@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script language="javascript type="text/javascript"> 
+	function validateForm() {
+  	var pass = document.forms["myForm"]["password"].value;
+  	if (pass.length < 8) {
+		var element = document.getElementById("id01");
+   	 	element.innerHTML = "Password must be at least 8 characters"a
+    	return false;
+  }
+}
+	</script>
+
+
+
+
+
   <title>Registration Form</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -8,13 +23,12 @@
 </head>
 <body style="background-color:darkslategray;">
 	<div class="contents">
-	<div class="center">
 	<h1>Registration form</h1>
 	<form>First name: <input type="text" name="firstname" /></form>
-	<form>Last name: <input type="text" name="firstname" /></form>
-	<form>Nick name: <input type="text" name="firstname" /></form>
-	<form>Email name: <input type="text" name="firstname" /></form>
-	<form>Password: <input type="text" name="firstname" /></form>
+	<form>Last name: <input type="text" name="lastname" /></form>
+	<form>Nick name: <input type="text" name="nickname" /></form>
+	<form>Email: <input type="text" name="email" /></form>
+	<form>Password: <input type="text" name="password" /></form>
 	<label for="birthday">Date of Birth:</label>
 	<input type="date" id="birthday" name="birthday"><br>
 	
@@ -27,7 +41,6 @@
 	Address:
 	<textarea rows="10" cols="30"></textarea><br>
 	<input type="submit" value="submit"> <input type="reset" value="reset">
-	</div>
 	</div>
 </body>
 
