@@ -3,29 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exploit Test</title>
+    <title>PostMessage Exploit Attempt</title>
 </head>
 <body>
-    <h1>Click Below to Open the Pop-up</h1>
-    <button id="exploitBtn">Launch Pop-up</button>
+    <h1>PostMessage Debugging</h1>
+    <button id="openPopup">Open Etsy</button>
+    <button id="sendMessage">Send Message to Etsy</button>
 
     <script>
-        document.getElementById("exploitBtn").addEventListener("click", () => {
-            let popup = window.open("https://www.etsy.com", "EtsyPopup", "width=800,height=600");
+        let popupWindow;
 
-            if (popup) {
-                console.log("[+] Pop-up opened successfully. Checking access...");
-
-                setTimeout(() => {
-                    try {
-                        console.log("[+] Attempting to execute JS in pop-up...");
-                        popup.eval(`console.log("[*] Injected Script Running"); alert(document.cookie);`);
-                    } catch (err) {
-                        console.error("[!] Exploit failed:", err);
-                    }
-                }, 3000);
+        document.getElementById("openPopup").addEventListener("click", function() {
+            popupWindow = window.open("https://www.etsy.com", "EtsyPopup", "width=800,height=600");
+            
+            if (!popupWindow) {
+                console.log("[!] Failed to open pop-up. Check pop-up blocker settings.");
             } else {
-                console.log("[!] Pop-up blocked. Allow pop-ups and try again.");
+                console.log("[+] Pop-up opened successfully.");
+            }
+        });
+
+        document.getElementById("sendMessage").addEventListener("click", function() {
+            if (popupWindow) {
+                console.log("[+] Sending message to Etsy...");
+                popupWindow.postMessage("Hello Etsy!", "https://www.etsy.com");
+            } else {
+                console.log("[!] Pop-up window not found. Open Etsy first.");
+            }
+        });
+
+        window.addEventListener("message", function(event) {
+            console.log(`[+] Message received from ${event.origin}:`, event.data);
+
+            if (event.origin === "https://www.etsy.com") {
+                console.log("[*] Etsy responded:", event.data);
+            } else {
+                console.log("[!] Unexpected message from unknown origin.");
             }
         });
     </script>
